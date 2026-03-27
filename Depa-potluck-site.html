@@ -251,6 +251,21 @@
       padding: 16px;
     }
 
+    .delete-btn {
+      margin-top: 10px;
+      background: #ffe5ec;
+      color: #c1121f;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background: #ffccd5;
+    }
+
     .tag {
       display: inline-block;
       font-size: 0.8rem;
@@ -326,9 +341,7 @@
   <div class="container">
     <section class="hero">
       <h1>🌸 DEPA Spring 2026 Potluck 🍲</h1>
-      <p>
-        Tell us what you're bringing, check what others are bringing, and let the potluck excitement build 🎉
-      </p>
+      
     </section>
 
     <section class="top-grid">
@@ -388,10 +401,7 @@
           <div class="error" id="errorMsg">Something went wrong. Please check your setup and try again.</div>
         </form>
 
-        <p class="footer-note">
-          <strong>Important:</strong> for this site to actually save submissions for everyone, connect it to <strong>Supabase</strong>.
-          Static hosting on GitHub Pages or Netlify alone will show the page, but it will not store shared submissions unless you add a backend/database.
-        </p>
+        
       </div>
 
       <div class="card">
@@ -531,9 +541,21 @@
             <h3>${escapeHtml(item.item_name)}</h3>
             <div class="meta">${escapeHtml(item.name)} • ${escapeHtml(item.designation)}</div>
             ${notes}
+            <button class="delete-btn" data-id="${item.id}">🗑️ Delete</button>
           </div>
         `;
         feed.appendChild(card);
+
+        const deleteBtn = card.querySelector('.delete-btn');
+        deleteBtn.addEventListener('click', async () => {
+          if (!confirm('Delete this item?')) return;
+          const { error } = await supabase.from(TABLE_NAME).delete().eq('id', item.id);
+          if (error) {
+            alert('Delete failed');
+            return;
+          }
+          fetchItems();
+        });
       });
 
       totalCount.textContent = allItems.length;
